@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  php:
+    container_name: php-cli
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - .:/app
