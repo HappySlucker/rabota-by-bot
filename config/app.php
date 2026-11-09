@@ -7,6 +7,7 @@ return [
     'url' => (string) env('APP_URL', 'https://rabota.by'),
 
     'debug' => (bool) env('APP_DEBUG', true),
+    'debug_path' => (string) env('APP_DEBUG_PATH', 'logs/debug'),
 
     'account' => [
         'country' => (string) env('ACCOUNT_COUNTRY', 'BY'), // RU, BY, KZ, UZ
