@@ -60,8 +60,19 @@ class JsExecutor
                 let el = document.querySelector(arguments[0]);
                 if (!el) return false;
                 el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                el[arguments[1]] = arguments[2];
-                
+                el.focus();
+
+                let proto = el instanceof HTMLTextAreaElement
+                    ? HTMLTextAreaElement.prototype
+                    : HTMLInputElement.prototype;
+                let setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+
+                if (setter) {
+                    setter.call(el, arguments[2]);
+                } else {
+                    el[arguments[1]] = arguments[2];
+                }
+
                 let eventInput = new Event('input', { bubbles: true });
                 let eventChange = new Event('change', { bubbles: true });
                 el.dispatchEvent(eventInput);
