@@ -18,15 +18,31 @@ An automated **Selenium WebDriver** assistant designed to keep your visibility h
 
 ---
 
-Before launching the application, you must provide your Rabota.by credentials. Edit the `config/app.php` file and update the `account` array:
+Configuration is read from environment variables. Copy the example file and fill in your values:
 
-```php
-'account' => [
-    'country'  => 'BY', // Options: RU, BY, KZ, UZ
-    'phone'    => '+375XXXXXXXXX',
-    'password' => 'your_password_here'
-],
+```bash
+cp .env.example .env
 ```
+
+Minimum required variables:
+
+```dotenv
+ACCOUNT_COUNTRY=BY # Options: RU, BY, KZ, UZ
+ACCOUNT_PHONE=+375XXXXXXXXX
+ACCOUNT_PASSWORD=your_password_here
+```
+
+The `.env` file is ignored by Git and is never overwritten by project updates.
+
+### Feature modules
+
+Enabled modules are configured in `config/modules.php` and can be toggled from `.env`:
+
+```dotenv
+ENABLE_RESUME_UPDATER=true
+```
+
+To add a new module, implement `App\Bot\Module\BotModule` and register it in `config/modules.php`. The `Handler` runs `Auth` first, then every enabled module in order.
 
 ## 🛠 Application Launch Guide
 
