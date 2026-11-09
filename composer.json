@@ -16,7 +16,8 @@
     "ext-zip": "*",
     "simplehtmldom/simplehtmldom": "^2.0@RC",
     "monolog/monolog": "^3.5",
-    "php-di/php-di": "^7.1"
+    "php-di/php-di": "^7.1",
+    "vlucas/phpdotenv": "^5.8"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,

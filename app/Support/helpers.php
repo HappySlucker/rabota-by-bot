@@ -31,6 +31,28 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('env')) {
+    /**
+     * Get the value of an environment variable.
+     */
+    function env(string $key, mixed $default = null): mixed
+    {
+        $value = $_ENV[$key] ?? $_SERVER[$key] ?? false;
+
+        if ($value === false) {
+            return $default;
+        }
+
+        return match (strtolower((string) $value)) {
+            'true', '(true)' => true,
+            'false', '(false)' => false,
+            'null', '(null)' => null,
+            'empty', '(empty)' => '',
+            default => $value,
+        };
+    }
+}
+
 if (!function_exists('dd')) {
     function dd(mixed $data): void
     {
