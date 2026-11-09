@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App;
 
 use App\Bot\Handler as BotHandler;
+use App\Bot\Module\ModuleRegistry;
+use App\Bot\Module\ModuleRegistryFactory;
 use App\Selenium\SeleniumServer;
 use App\ServiceProviders\ConfigServiceProvider;
 use App\WebDriver\DriverFactory;
@@ -30,6 +32,9 @@ class Application
         $builder->addDefinitions([
             RemoteWebDriver::class => static function () {
                 return DriverFactory::create(config('webdriver.headless', true));
+            },
+            ModuleRegistry::class => static function (ContainerInterface $container) {
+                return (new ModuleRegistryFactory($container))->create();
             },
         ]);
 

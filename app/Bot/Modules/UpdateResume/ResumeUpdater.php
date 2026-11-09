@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Bot\Modules\UpdateResume;
 
+use App\Bot\Module\BotModule;
 use App\Bot\Modules\UpdateResume\Enums\ResumeElementSelector;
 use App\Exception\ResumeUpdaterException;
 use App\WebDriver\UrlLoader;
@@ -12,7 +13,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
-class ResumeUpdater
+class ResumeUpdater implements BotModule
 {
     private const string RESUME_LIST_PAGE = '/applicant/resumes';
 
@@ -20,6 +21,16 @@ class ResumeUpdater
         private readonly RemoteWebDriver $webDriver,
         private readonly UrlLoader $urlLoader,
     ) {
+    }
+
+    public function name(): string
+    {
+        return 'resume_updater';
+    }
+
+    public function run(): void
+    {
+        $this->update();
     }
 
     public function update(): bool
