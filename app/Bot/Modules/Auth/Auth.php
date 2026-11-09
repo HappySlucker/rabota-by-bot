@@ -6,21 +6,23 @@ namespace App\Bot\Modules\Auth;
 
 use App\Bot\DTO\Account;
 use App\Bot\Modules\Auth\Enums\AuthElementSelector;
+use App\Debug\Debugger;
 use App\Exception\AuthException;
 use App\WebDriver\JsExecutor;
 use App\WebDriver\UrlLoader;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
-use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class Auth
 {
     private const string LOGIN_PAGE = '/account/login?role=applicant';
+    private const string LOGIN_PATH = '/account/login';
 
     public function __construct(
         private readonly RemoteWebDriver $webDriver,
         private readonly UrlLoader $urlLoader,
         private readonly JsExecutor $jsExecutor,
+        private readonly Debugger $debugger,
     ) {
     }
 
@@ -39,10 +41,15 @@ class Auth
             $this->pastePhoneNumber($account->phone);
             $this->pastePassword($account->password);
 
+            $this->debugger->screenshot('auth-form-filled');
+
             $this->webDriver->findElement(WebDriverBy::cssSelector(AuthElementSelector::SUBMIT_LOGIN_BTN->value))->click();
+
+            $this->debugger->snapshot('auth-after-submit');
 
             return $this->isAuthorized();
         } catch (\Throwable $e) {
+            $this->debugger->snapshot('auth-error');
             logger()->error($e->getMessage());
 
             throw new AuthException($e->getMessage());
@@ -56,13 +63,26 @@ class Auth
                 config('webdriver.wait.timeout_in_seconds'),
                 config('webdriver.wait.interval_in_milliseconds'),
             )->until(
-                WebDriverExpectedCondition::presenceOfElementLocated(
-                    WebDriverBy::cssSelector(AuthElementSelector::NOTIFICATION_BTN->value),
-                ),
+                static function (RemoteWebDriver $webDriver): bool {
+                    if (!str_contains($webDriver->getCurrentURL(), self::LOGIN_PATH)) {
+                        return true;
+                    }
+
+                    return $webDriver->findElements(
+                        WebDriverBy::cssSelector(AuthElementSelector::NOTIFICATION_BTN->value),
+                    ) !== [];
+                },
             );
 
             return true;
         } catch (\Throwable) {
+            $this->debugger->snapshot('auth-not-authorized');
+            logger()->error(sprintf(
+                'Authorization failed. URL: %s, title: %s',
+                $this->webDriver->getCurrentURL(),
+                $this->webDriver->getTitle(),
+            ));
+
             return false;
         }
     }
